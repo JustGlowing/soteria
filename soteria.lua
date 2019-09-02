@@ -394,8 +394,8 @@ function TIC()
   if mode == 'menu' then
     cls()
     map(0, 0)
-    print('Soteria', 70, 30, 15, 1, 2)
-    print('Press X to start', 70, 50, 15, 1, 1)
+    print('Soteria', 75, 35, 15, 1, 2)
+    print('Press X to start', 70, 55, 15, 1, 1)
     print('Arrows - move around', 70, 80, 15, 1, 1)
     print('     Z - jump', 70, 90, 15, 1, 1)
     print('     X - make them jump!', 70, 100, 15, 1, 1)
@@ -418,16 +418,27 @@ function TIC()
     end
   end
 
+  if mode == 'nextlevel' then
+    cls()
+    map(80, 80)        
+    print('Ready?', 75, 30, 15, 1, 2)
+    print('Press X to go to the next level', 10, 90, 15, 1, 1)
+    if btnp(5) then
+      mode='game'
+      level=level+1
+  	  reset_leve()
+    end
+  end
+
   if dead_lems + score == num_lems then
   	if score < 5 then
   	 mode='gameover'
   	 reset_leve()
   	else
-  	 level=level+1
-  	 reset_leve()
+  	 mode='nextlevel'
   	end
   end
-  debug_print()
+  --debug_print()
 end
 
 -- <TILES>
