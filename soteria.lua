@@ -21,7 +21,8 @@ function init()
   solids={[33]=true, [34]=true, [49]=true, [50]=true}
   hazard={[25]=true, [26]=true}
 
-  levels={[0]={mapx=0, mapy=0, startpx=20, startpy=30, start_lemx=10, start_lemy=0},
+  levels={[0]={mapx=0, mapy=0, startpx=20, startpy=30, start_lemx=10, start_lemy=0,
+               enemies_positions={{x=112, y=120}, {x=90, y=120}}},
           [1]={mapx=30, mapy=1, startpx=20, startpy=30, start_lemx=10, start_lemy=0},
           [2]={mapx=60, mapy=1, startpx=112, startpy=0, start_lemx=10, start_lemy=0}
   }
@@ -30,7 +31,7 @@ function init()
   dead_lems=0
   num_lems=10
   mode='menu'
-  level=1
+  level=0
 
   p={
     x=20, 
@@ -45,23 +46,40 @@ function init()
     h=2*8-1, 
     vx=0, --Velocity X
     vy=0, --Velocity Y
-    colorkey = 0, 
+    colorkey=0, 
     orientation = 1, 
     kick=false,
     dead=false,
     d=2
   }  
-  place_lems(60, 20, 10)
   frames=0
   wait_frames = 20 -- to wait before game over
+
+  lems={}
+  enemies={}
+
   camera={
   	x=0,
     y=0
   }
 end
 
-function place_lems(start_x, start_y, step)
-  lems={}
+function place_enemies()
+ for i,v in ipairs(levels[level].enemies_positions) do
+   local enemy={
+      x=v.x, 
+      y=v.y, 
+      vx=.5, 
+      vy=0, 
+      orientation=1,
+      colorkey=0, 
+      sprite1=81
+    }
+   table.insert(enemies, enemy)
+ end
+end
+
+function place_lems(start_x, start_y, step)  
   for i=0, num_lems-1 do
     start_x=start_x+step
     local lem={
@@ -69,7 +87,7 @@ function place_lems(start_x, start_y, step)
       y=start_y, 
       vx=.5, 
       vy=0, 
-      orientation = 1, 
+      orientation=1, 
       sprite1=9
     }
     table.insert(lems, lem)
@@ -86,15 +104,73 @@ function debug_print()
   rect(p.x+7+p.vx, p.y+p.w+p.vy, 1, 1, 6)
   rect(p.x+p.vx, p.y+7+p.vy, 1, 1, 5)
 
-  print(tostring(p.x) .. ", " .. tostring(p.y .. ", " .. tostring(p.orientation) .. ", " .. tostring(level)), 112, 0)
+  print(tostring(p.x) .. ", " .. tostring(p.y) .. ", " .. tostring(p.orientation) .. ", " .. tostring(enemies[0]), 112, 0)
   for _, lem in ipairs(lems) do
     rect(lem.x, lem.y, 1, 1, 6)
   end
+
+  for _, ene in ipairs(enemies) do
+    rect(ene.x, ene.y, 1, 1, 11)
+  end
+end
+
+function update_enemy()
+ for i, enemy in ipairs(enemies) do
+    if solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
+    or solid(enemy.x+enemy.vx, enemy.y+7+enemy.vy) then
+      if enemy.vy==0 then
+        enemy.vx=.5
+        enemy.orientation=1
+      end
+    end
+
+    if solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy) or
+    solid(enemy.x+7+enemy.vx, enemy.y+7+enemy.vy) then
+      if enemy.vy==0 then
+        enemy.vx=-.5
+        enemy.orientation=0
+      end
+    end
+
+    if solid(enemy.x, enemy.y+8+enemy.vy)
+    or solid(enemy.x+7, enemy.y+8+enemy.vy) then
+      enemy.vy=0
+    else
+      enemy.vy=enemy.vy+0.2
+    end
+
+    if enemy.vy<0 and (solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
+    or solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy)) then
+      enemy.vy=0
+    end
+
+    --if box_hit(p.x,p.y,p.w,p.w,enemy.x,enemy.y,8,8) then
+    --  p.dead=true
+    --end
+
+    if p.kick and math.abs(enemy.x-p.x)<8 and math.abs(enemy.y-p.y-8)<8 then
+      --sfx(0, 60, 8)
+      table.remove(enemies, i)
+    end
+
+    enemy.x=enemy.x+enemy.vx
+    enemy.y=enemy.y+enemy.vy
+ end
+end
+
+function box_hit(x1,y1,w1,h1,x2,y2,w2,h2)
+  local xd=math.abs((x1+(w1/2))-(x2+(w2/2)))
+  local xs=w1*0.5+w2*0.5
+  local yd=math.abs((y1+(h1/2))-(y2+(h2/2)))
+  local ys=h1/2+h2/2
+  if xd<xs and yd<ys then 
+    return true 
+  end
+  
+  return false
 end
 
 function update_lem()
-  to_remove = {}
-
   for i, lem in ipairs(lems) do
     if solid(lem.x+lem.vx, lem.y+lem.vy)
     or solid(lem.x+lem.vx, lem.y+7+lem.vy) then
@@ -152,6 +228,13 @@ function update_lem()
       dead_lems=dead_lems+1
       table.remove(lems, i)
     end
+
+    for _, ene in ipairs(enemies) do
+     if box_hit(lem.x,lem.y,8,8,ene.x,ene.y,8,8) then
+      dead_lems=dead_lems+1
+      table.remove(lems, i)
+     end
+    end
   end
 end
 
@@ -183,7 +266,7 @@ function update_player()
   or solid(p.x+7+p.vx, p.y+p.h+1+p.vy) then
     p.vy=0
   else
-    p.vy=p.vy+0.2
+    p.vy=p.vy+0.15
 
   end
 
@@ -203,7 +286,6 @@ function update_player()
   end
 
   if hit_hazard(p.x, p.y) or hit_hazard(p.x+p.h, p.y+p.w) then
-    --mode='gameover'
     p.dead = true
   end
 
@@ -243,9 +325,14 @@ function draw_sprites()
    spr(p.sprite_dead, p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
   end
 
-  for i, lem in pairs(lems) do
-    spr(9+(frames%60//30*2)/2, lems[i].x, lems[i].y, lems[i].colorkey, 1, lems[i].orientation, 0)
+  for _, lem in pairs(lems) do
+    spr(lem.sprite1+(frames%60//30*2)/2, lem.x, lem.y, lem.colorkey, 1, lem.orientation, 0)
   end
+
+  for _, ene in ipairs(enemies) do
+    spr(ene.sprite1+(frames%60//30*2)/2, ene.x, ene.y, ene.colorkey, 1, ene.orientation, 0)
+  end
+
   print("score " .. tostring(score), 4, 0)
 end
 
@@ -255,7 +342,10 @@ function reset_leve()
  p.dead=false
  dead_lems=0
  score=0
+ lems={}
+ enemies={}
  place_lems(levels[level].start_lemx, levels[level].start_lemy, 10)
+ place_enemies()
 end
 
 init()
@@ -265,6 +355,7 @@ function TIC()
     if p.dead == false then
      update_player()
      update_lem()
+     update_enemy()
      cls()
      camera.x=camera.x-p.vx
      map(levels[level].mapx,levels[level].mapy)
@@ -306,7 +397,7 @@ function TIC()
   	 reset_leve()
   	end
   end
-  --debug_print()
+  debug_print()
 end
 
 -- <TILES>
