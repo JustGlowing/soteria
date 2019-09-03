@@ -1,6 +1,6 @@
--- title:  game title
--- author: game developer
--- desc:   short description
+-- title:  Soteria
+-- author: JustGlowing
+-- desc:   Save them all!
 -- script: lua
 
 frames = 0
