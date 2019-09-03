@@ -45,7 +45,7 @@ score=0
 dead_lems=0
 num_lems=10
 mode='menu'
-level=1
+level=0
 
 p={
   x=20, 
@@ -277,6 +277,11 @@ else
   p.vx=0
 end
 
+if p.vy==0 and btnp(4) then
+  sfx(jump_sound, 60, 18)
+  p.vy=-2.5
+end
+
 if solid(p.x+p.vx, p.y+p.vy)
 or solid(p.x+p.w+p.vx, p.y+p.vy)
 or solid(p.x+p.vx, p.y+p.h+p.vy)
@@ -294,12 +299,6 @@ or solid(p.x+7+p.vx, p.y+p.h+1+p.vy) then
   p.vy=0
 else
   p.vy=p.vy+0.15
-
-end
-
-if p.vy==0 and btnp(4) then
-  sfx(jump_sound, 60, 18)
-  p.vy=-2.5
 end
 
 if btnp(5) then
@@ -441,11 +440,11 @@ if mode == 'nextlevel' then
   map(210, 120)
   print('Well done!', 35, 30, 15, 1, 2)
   
-  print('You saved ' .. tostring(score) .. 'of them', 20, 70, 15, 1, 1)
+  print('You saved ' .. tostring(score) .. ' of them', 20, 70, 15, 1, 1)
   print('Press X to go to the next level', 20, 90, 15, 1, 1)
   if btnp(5) then
     mode='game'
-    sfx(0, 60, 8)
+    level=level+1
     reset_leve()
   end
 end
@@ -456,6 +455,7 @@ if dead_lems + score == num_lems then
     reset_leve()
   else
     mode='nextlevel'
+
   end
 end
 --debug_print()
