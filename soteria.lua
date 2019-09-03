@@ -25,436 +25,436 @@ function init()
   magic_sound=0
   lem_dead_sound=3
 
-  music(intro_music,-1,-1,false)
+  music(intro_music, -1, -1, false)
   solids={[33]=true, [34]=true, [49]=true, [50]=true}
   hazard={[25]=true, [26]=true}
 
-  levels={[0]={mapx=0, mapy=0, startpx=20, startpy=30, start_lemx=10, start_lemy=0,
-               enemies_positions={}},
-          [1]={mapx=30, mapy=1, startpx=20, startpy=30, start_lemx=10, start_lemy=0,
-               enemies_positions={}},
-          [2]={mapx=60, mapy=1, startpx=112, startpy=0, start_lemx=10, start_lemy=0,
-               enemies_positions={{x=112, y=120}, {x=218, y=40}}},
-          [3]={mapx=90, mapy=1, startpx=20, startpy=30, start_lemx=10, start_lemy=0,
-               enemies_positions={}},
-  }
+  levels={[0]={mapx=0, mapy=0, startpx=20, startpy=30, start_lemx=10, start_lemy=0, 
+  enemies_positions={}}, 
+  [1]={mapx=30, mapy=1, startpx=20, startpy=30, start_lemx=10, start_lemy=0, 
+  enemies_positions={}}, 
+  [2]={mapx=60, mapy=1, startpx=112, startpy=0, start_lemx=10, start_lemy=0, 
+  enemies_positions={{x=112, y=120}, {x=218, y=40}}}, 
+  [3]={mapx=90, mapy=1, startpx=20, startpy=30, start_lemx=10, start_lemy=0, 
+  enemies_positions={}}, 
+}
 
-  score=0
-  dead_lems=0
-  num_lems=10
-  mode='menu'
-  level=3
+score=0
+dead_lems=0
+num_lems=10
+mode='menu'
+level=3
 
-  p={
-    x=20, 
-    y=30, 
-    sprite_idx=0, 
-    sprite_jump=7,
-    sprite_dead=37,
-    sprite={[1]=1,[2]=3,[3]=5},
-    w_sprite=2, 
-    h_sprite=2, 
-    w=2*8-1, 
-    h=2*8-1, 
-    vx=0,
-    vy=0,
-    colorkey=0, 
-    orientation = 1, 
-    kick=false,
-    dead=false,
-    d=2
-  }  
-  frames=0
-  wait_frames = 20 -- to wait before game over
+p={
+  x=20, 
+  y=30, 
+  sprite_idx=0, 
+  sprite_jump=7, 
+  sprite_dead=37, 
+  sprite={[1]=1, [2]=3, [3]=5}, 
+  w_sprite=2, 
+  h_sprite=2, 
+  w=2*8-1, 
+  h=2*8-1, 
+  vx=0, 
+  vy=0, 
+  colorkey=0, 
+  orientation = 1, 
+  kick=false, 
+  dead=false, 
+  d=2
+}
+frames=0
+wait_frames = 20 -- to wait before game over
 
-  lems={}
-  enemies={}
-  gameover_music_plaied=false
+lems={}
+enemies={}
+gameover_music_plaied=false
 
-  camera={
-  	x=0,
-    y=0
-  }
+camera={
+  x=0, 
+  y=0
+}
 end
 
 function place_enemies()
- for i,v in ipairs(levels[level].enemies_positions) do
-   local enemy={
-      x=v.x, 
-      y=v.y, 
-      vx=.5, 
-      vy=0, 
-      orientation=1,
-      colorkey=0, 
-      sprite1=113
-    }
-   table.insert(enemies, enemy)
- end
+for i, v in ipairs(levels[level].enemies_positions) do
+  local enemy={
+    x=v.x, 
+    y=v.y, 
+    vx=.5, 
+    vy=0, 
+    orientation=1, 
+    colorkey=0, 
+    sprite1=113
+  }
+  table.insert(enemies, enemy)
+end
 end
 
-function place_lems(start_x, start_y, step)  
-  for i=0, num_lems-1 do
-    start_x=start_x+step
-    local lem={
-      x=start_x, 
-      y=start_y, 
-      vx=.5, 
-      vy=0, 
-      orientation=1, 
-      sprite1=9,
-      sprite_dead=11,
-      dead=false
-    }
-    table.insert(lems, lem)
-  end
+function place_lems(start_x, start_y, step)
+for i=0, num_lems-1 do
+  start_x=start_x+step
+  local lem={
+    x=start_x, 
+    y=start_y, 
+    vx=.5, 
+    vy=0, 
+    orientation=1, 
+    sprite1=9, 
+    sprite_dead=11, 
+    dead=false
+  }
+  table.insert(lems, lem)
+end
 end
 
 function debug_print()
-  rect(p.x, p.y, 1, 1, 6)
-  rect(p.x+p.h, p.y, 1, 1, 5)
-  rect(p.x, p.y+p.w, 1, 1, 5)
-  rect(p.x+p.h, p.y+p.w, 1, 1, 5)
-  rect(p.x+7+p.vx, p.y+p.vy, 1, 1, 5)
-  rect(p.x+p.w+p.vx, p.y+7+p.vy, 1, 1, 5)
-  rect(p.x+7+p.vx, p.y+p.w+p.vy, 1, 1, 6)
-  rect(p.x+p.vx, p.y+7+p.vy, 1, 1, 5)
+rect(p.x, p.y, 1, 1, 6)
+rect(p.x+p.h, p.y, 1, 1, 5)
+rect(p.x, p.y+p.w, 1, 1, 5)
+rect(p.x+p.h, p.y+p.w, 1, 1, 5)
+rect(p.x+7+p.vx, p.y+p.vy, 1, 1, 5)
+rect(p.x+p.w+p.vx, p.y+7+p.vy, 1, 1, 5)
+rect(p.x+7+p.vx, p.y+p.w+p.vy, 1, 1, 6)
+rect(p.x+p.vx, p.y+7+p.vy, 1, 1, 5)
 
-  print(tostring(p.x) .. ", " .. tostring(p.y) .. ", " .. tostring(p.orientation) .. ", " .. tostring(dead_lems), 112, 0)
-  for _, lem in ipairs(lems) do
-    rect(lem.x, lem.y, 1, 1, 6)
-  end
+print(tostring(p.x) .. ", " .. tostring(p.y) .. ", " .. tostring(p.orientation) .. ", " .. tostring(dead_lems), 112, 0)
+for _, lem in ipairs(lems) do
+  rect(lem.x, lem.y, 1, 1, 6)
+end
 
-  for _, ene in ipairs(enemies) do
-    rect(ene.x, ene.y, 1, 1, 11)
-  end
+for _, ene in ipairs(enemies) do
+  rect(ene.x, ene.y, 1, 1, 11)
+end
 end
 
 function update_enemy()
- for i, enemy in ipairs(enemies) do
-    if solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
-    or solid(enemy.x+enemy.vx, enemy.y+7+enemy.vy) then
-      if enemy.vy==0 then
-        enemy.vx=.5
-        enemy.orientation=1
-      end
+for i, enemy in ipairs(enemies) do
+  if solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
+  or solid(enemy.x+enemy.vx, enemy.y+7+enemy.vy) then
+    if enemy.vy==0 then
+      enemy.vx=.5
+      enemy.orientation=1
     end
+  end
 
-    if solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy) or
-    solid(enemy.x+7+enemy.vx, enemy.y+7+enemy.vy) then
-      if enemy.vy==0 then
-        enemy.vx=-.5
-        enemy.orientation=0
-      end
+  if solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy) or
+  solid(enemy.x+7+enemy.vx, enemy.y+7+enemy.vy) then
+    if enemy.vy==0 then
+      enemy.vx=-.5
+      enemy.orientation=0
     end
+  end
 
-    if solid(enemy.x, enemy.y+8+enemy.vy)
-    or solid(enemy.x+7, enemy.y+8+enemy.vy) then
-      enemy.vy=0
-    else
-      enemy.vy=enemy.vy+0.2
-    end
+  if solid(enemy.x, enemy.y+8+enemy.vy)
+  or solid(enemy.x+7, enemy.y+8+enemy.vy) then
+    enemy.vy=0
+  else
+    enemy.vy=enemy.vy+0.2
+  end
 
-    if enemy.vy<0 and (solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
-    or solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy)) then
-      enemy.vy=0
-    end
+  if enemy.vy<0 and (solid(enemy.x+enemy.vx, enemy.y+enemy.vy)
+  or solid(enemy.x+7+enemy.vx, enemy.y+enemy.vy)) then
+    enemy.vy=0
+  end
 
-    --if box_hit(p.x,p.y,p.w,p.w,enemy.x,enemy.y,8,8) then
-    --  p.dead=true
-    --end
+  --if box_hit(p.x, p.y, p.w, p.w, enemy.x, enemy.y, 8, 8) then
+  --  p.dead=true
+  --end
 
-    if p.kick and math.abs(enemy.x-p.x)<8 and math.abs(enemy.y-p.y-8)<8 then
-      --sfx(0, 60, 8)
-      table.remove(enemies, i)
-    end
+  if p.kick and math.abs(enemy.x-p.x)<8 and math.abs(enemy.y-p.y-8)<8 then
+    --sfx(0, 60, 8)
+    table.remove(enemies, i)
+  end
 
-    enemy.x=enemy.x+enemy.vx
-    enemy.y=enemy.y+enemy.vy
- end
+  enemy.x=enemy.x+enemy.vx
+  enemy.y=enemy.y+enemy.vy
+end
 end
 
-function box_hit(x1,y1,w1,h1,x2,y2,w2,h2)
-  local xd=math.abs((x1+(w1/2))-(x2+(w2/2)))
-  local xs=w1*0.5+w2*0.5
-  local yd=math.abs((y1+(h1/2))-(y2+(h2/2)))
-  local ys=h1/2+h2/2
-  if xd<xs and yd<ys then 
-    return true 
-  end
-  
-  return false
+function box_hit(x1, y1, w1, h1, x2, y2, w2, h2)
+local xd=math.abs((x1+(w1/2))-(x2+(w2/2)))
+local xs=w1*0.5+w2*0.5
+local yd=math.abs((y1+(h1/2))-(y2+(h2/2)))
+local ys=h1/2+h2/2
+if xd<xs and yd<ys then
+  return true
+end
+
+return false
 end
 
 function update_lem()
-  for i, lem in ipairs(lems) do
-    if solid(lem.x+lem.vx, lem.y+lem.vy)
-    or solid(lem.x+lem.vx, lem.y+7+lem.vy) then
-      if lem.vy==0 then
-        lem.vx=.5
-        lem.orientation=1
-      end
-    end
-
-    if solid(lem.x+7+lem.vx, lem.y+lem.vy) or
-    solid(lem.x+7+lem.vx, lem.y+7+lem.vy) then
-      if lem.vy==0 then
-        lem.vx=-.5
-        lem.orientation=0
-      end
-    end
-
-    if solid(lem.x, lem.y+8+lem.vy)
-    or solid(lem.x+7, lem.y+8+lem.vy) then
-      lem.vy=0
-    else
-      lem.vy=lem.vy+0.2
-    end
-
-    if lem.vy<0 and (solid(lem.x+lem.vx, lem.y+lem.vy)
-    or solid(lem.x+7+lem.vx, lem.y+lem.vy)) then
-      lem.vy=0
-    end
-
-    if p.kick and p.orientation==0
-    and math.abs(lem.x-p.x)<8 and math.abs(lem.y-p.y-8)<8 then
-      lem.vy=-3.
-      lem.vx=-1.
-      lem.orientation=p.orientation
-    end
-
-    if p.kick and p.orientation==1
-    and math.abs(lem.x-(p.x+p.w))<8 and math.abs(lem.y-p.y-8)<8 then
-      lem.vy=-3.
-      lem.vx=1.
-      lem.orientation=p.orientation
-    end
-
-    if lem.dead == false then
-     lem.x=lem.x+lem.vx
-     lem.y=lem.y+lem.vy
-    end
-
-    if hit_door(lem.x, lem.y) then
-      score=score+1
-      table.remove(lems, i)
-    end
-
-    if lem.dead == false and hit_hazard(lem.x, lem.y) then
-      dead_lems=dead_lems+1
-      lem.dead=true   
-      sfx(lem_dead_sound, 30, 12)   
-    end
-
-    for _, ene in ipairs(enemies) do
-     if lem.dead == false and box_hit(lem.x,lem.y,8,8,ene.x,ene.y,8,8) then
-      dead_lems=dead_lems+1
-      lem.dead=true
-      sfx(lem_dead_sound, 30, 12)   
-     end
+for i, lem in ipairs(lems) do
+  if solid(lem.x+lem.vx, lem.y+lem.vy)
+  or solid(lem.x+lem.vx, lem.y+7+lem.vy) then
+    if lem.vy==0 then
+      lem.vx=.5
+      lem.orientation=1
     end
   end
-  
-  if frames%30 == 0 then -- clear dead lems every 30 frames
-    for i, lem in ipairs(lems) do
-      if lem.dead then
-        table.remove(lems, i)
-      end
+
+  if solid(lem.x+7+lem.vx, lem.y+lem.vy) or
+  solid(lem.x+7+lem.vx, lem.y+7+lem.vy) then
+    if lem.vy==0 then
+      lem.vx=-.5
+      lem.orientation=0
     end
   end
-end
 
-function update_player()
-  p.kick=false
-  if btn(2) then
-    p.vx=-1
-    p.orientation = 0
-  elseif btn(3) then
-    p.vx=1
-    p.orientation = 1
+  if solid(lem.x, lem.y+8+lem.vy)
+  or solid(lem.x+7, lem.y+8+lem.vy) then
+    lem.vy=0
   else
-    p.vx=0
+    lem.vy=lem.vy+0.2
   end
 
-  if solid(p.x+p.vx, p.y+p.vy)
-  or solid(p.x+p.w+p.vx, p.y+p.vy)
-  or solid(p.x+p.vx, p.y+p.h+p.vy)
-  or solid(p.x+p.w+p.vx, p.y+p.h+p.vy)
-  or solid(p.x+7+p.vx, p.y+p.vy)
-  or solid(p.x+p.w+p.vx, p.y+7+p.vy)
-  or solid(p.x+p.vx, p.y+7+p.vy)
-  then
-    p.vx=0
+  if lem.vy<0 and (solid(lem.x+lem.vx, lem.y+lem.vy)
+  or solid(lem.x+7+lem.vx, lem.y+lem.vy)) then
+    lem.vy=0
   end
 
-  if solid(p.x, p.y+p.h+p.vy+1)
-  or solid(p.x+p.w, p.y+p.h+p.vy+1)
-  or solid(p.x+7+p.vx, p.y+p.h+1+p.vy) then
-    p.vy=0
-  else
-    p.vy=p.vy+0.15
-
+  if p.kick and p.orientation==0
+  and math.abs(lem.x-p.x)<8 and math.abs(lem.y-p.y-8)<8 then
+    lem.vy=-3.
+    lem.vx=-1.
+    lem.orientation=p.orientation
   end
 
-  if p.vy==0 and btnp(4) then
-    sfx(jump_sound, 60, 18)
-    p.vy=-2.5
+  if p.kick and p.orientation==1
+  and math.abs(lem.x-(p.x+p.w))<8 and math.abs(lem.y-p.y-8)<8 then
+    lem.vy=-3.
+    lem.vx=1.
+    lem.orientation=p.orientation
   end
 
-  if btnp(5) then
-    sfx(magic_sound, 30, 12)
-    p.kick=true
+  if lem.dead == false then
+    lem.x=lem.x+lem.vx
+    lem.y=lem.y+lem.vy
   end
 
-  if p.vy<0 and (solid(p.x+p.vx, p.y+p.vy)
-  or solid(p.x+p.w+p.vx, p.y+p.vy)) then
-    p.vy=0
+  if hit_door(lem.x, lem.y) then
+    score=score+1
+    table.remove(lems, i)
   end
 
-  if hit_hazard(p.x, p.y) or hit_hazard(p.x+p.h, p.y+p.w) then
-    p.dead = true
-  end
-
-  p.x=p.x+p.vx --locked in the middle of the screen 112
-  p.y=p.y+p.vy  
-end
-
-function walking_animation()
-  if p.vx ~= 0 then
-	  p.d=p.d-1
-	  if p.d<0 then
-	  	p.sprite_idx=p.sprite_idx+1
-	  	if p.sprite_idx > 3 then p.sprite_idx=1 end
-	  	p.d=2
-	  end
-  else
-  	p.sprite_idx=1
-  end
-end
-
-function wait_before_gameover()
- wait_frames = wait_frames-1
- if wait_frames < 0 then
-  mode = 'gameover'
- end 
-end
-
-function draw_sprites()
-  walking_animation()
-  if p.vy ~= 0 then
-  	spr(p.sprite_jump, p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
-  else
-  	spr(p.sprite[p.sprite_idx], p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
-  end
-
-  if p.kick == true then  	
-  	if p.orientation == 0 then
-  	 spr(67, p.x-3, p.y+8, p.colorkey, 1, p.orientation, 0)
-  	else
-  	 spr(67, p.x+11, p.y+8, p.colorkey, 1, p.orientation, 0)	
-  	end
-  end
-
-  if p.dead then
-   spr(p.sprite_dead, p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
-  end
-
-  for _, lem in pairs(lems) do
-    if lem.dead == false then
-      spr(lem.sprite1+(frames%60//30*2)/2, lem.x, lem.y, lem.colorkey, 1, lem.orientation, 0)      
-    else
-      spr(lem.sprite_dead, lem.x, lem.y, lem.colorkey, 1, lem.orientation, 0)
-    end
+  if lem.dead == false and hit_hazard(lem.x, lem.y) then
+    dead_lems=dead_lems+1
+    lem.dead=true
+    sfx(lem_dead_sound, 30, 12)
   end
 
   for _, ene in ipairs(enemies) do
-    spr(ene.sprite1+(frames%60//30*2)/2, ene.x, ene.y, ene.colorkey, 1, ene.orientation, 0)
+    if lem.dead == false and box_hit(lem.x, lem.y, 8, 8, ene.x, ene.y, 8, 8) then
+      dead_lems=dead_lems+1
+      lem.dead=true
+      sfx(lem_dead_sound, 30, 12)
+    end
   end
+end
 
-  print("score " .. tostring(score), 4, 0)
+if frames%30 == 0 then -- clear dead lems every 30 frames
+  for i, lem in ipairs(lems) do
+    if lem.dead then
+      table.remove(lems, i)
+    end
+  end
+end
+end
+
+function update_player()
+p.kick=false
+if btn(2) then
+  p.vx=-1
+  p.orientation = 0
+elseif btn(3) then
+  p.vx=1
+  p.orientation = 1
+else
+  p.vx=0
+end
+
+if solid(p.x+p.vx, p.y+p.vy)
+or solid(p.x+p.w+p.vx, p.y+p.vy)
+or solid(p.x+p.vx, p.y+p.h+p.vy)
+or solid(p.x+p.w+p.vx, p.y+p.h+p.vy)
+or solid(p.x+7+p.vx, p.y+p.vy)
+or solid(p.x+p.w+p.vx, p.y+7+p.vy)
+or solid(p.x+p.vx, p.y+7+p.vy)
+then
+  p.vx=0
+end
+
+if solid(p.x, p.y+p.h+p.vy+1)
+or solid(p.x+p.w, p.y+p.h+p.vy+1)
+or solid(p.x+7+p.vx, p.y+p.h+1+p.vy) then
+  p.vy=0
+else
+  p.vy=p.vy+0.15
+
+end
+
+if p.vy==0 and btnp(4) then
+  sfx(jump_sound, 60, 18)
+  p.vy=-2.5
+end
+
+if btnp(5) then
+  sfx(magic_sound, 30, 12)
+  p.kick=true
+end
+
+if p.vy<0 and (solid(p.x+p.vx, p.y+p.vy)
+or solid(p.x+p.w+p.vx, p.y+p.vy)) then
+  p.vy=0
+end
+
+if hit_hazard(p.x, p.y) or hit_hazard(p.x+p.h, p.y+p.w) then
+  p.dead = true
+end
+
+p.x=p.x+p.vx --locked in the middle of the screen 112
+p.y=p.y+p.vy
+end
+
+function walking_animation()
+if p.vx ~= 0 then
+  p.d=p.d-1
+  if p.d<0 then
+    p.sprite_idx=p.sprite_idx+1
+    if p.sprite_idx > 3 then p.sprite_idx=1 end
+    p.d=2
+  end
+else
+  p.sprite_idx=1
+end
+end
+
+function wait_before_gameover()
+wait_frames = wait_frames-1
+if wait_frames < 0 then
+  mode = 'gameover'
+end
+end
+
+function draw_sprites()
+walking_animation()
+if p.vy ~= 0 then
+  spr(p.sprite_jump, p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
+else
+  spr(p.sprite[p.sprite_idx], p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
+end
+
+if p.kick == true then
+  if p.orientation == 0 then
+    spr(67, p.x-3, p.y+8, p.colorkey, 1, p.orientation, 0)
+  else
+    spr(67, p.x+11, p.y+8, p.colorkey, 1, p.orientation, 0)
+  end
+end
+
+if p.dead then
+  spr(p.sprite_dead, p.x, p.y, p.colorkey, 1, p.orientation, 0, p.w_sprite, p.h_sprite)
+end
+
+for _, lem in pairs(lems) do
+  if lem.dead == false then
+    spr(lem.sprite1+(frames%60//30*2)/2, lem.x, lem.y, lem.colorkey, 1, lem.orientation, 0)
+  else
+    spr(lem.sprite_dead, lem.x, lem.y, lem.colorkey, 1, lem.orientation, 0)
+  end
+end
+
+for _, ene in ipairs(enemies) do
+  spr(ene.sprite1+(frames%60//30*2)/2, ene.x, ene.y, ene.colorkey, 1, ene.orientation, 0)
+end
+
+print("score " .. tostring(score), 4, 0)
 end
 
 function reset_leve()
- p.x=levels[level].startpx
- p.y=levels[level].startpy
- p.dead=false
- dead_lems=0
- score=0
- lems={}
- enemies={}
- place_lems(levels[level].start_lemx, levels[level].start_lemy, 10)
- place_enemies()
+p.x=levels[level].startpx
+p.y=levels[level].startpy
+p.dead=false
+dead_lems=0
+score=0
+lems={}
+enemies={}
+place_lems(levels[level].start_lemx, levels[level].start_lemy, 10)
+place_enemies()
 end
 
 init()
 function TIC()
-  frames = frames + 1
-  if mode == 'game' then
-    if p.dead == false then
-     update_player()
-     update_lem()
-     update_enemy()
-     cls()
-     camera.x=camera.x-p.vx
-     map(levels[level].mapx,levels[level].mapy)
-    else
-      wait_before_gameover()
-    end
-    draw_sprites()
+frames = frames + 1
+if mode == 'game' then
+  if p.dead == false then
+    update_player()
+    update_lem()
+    update_enemy()
+    cls()
+    camera.x=camera.x-p.vx
+    map(levels[level].mapx, levels[level].mapy)
+  else
+    wait_before_gameover()
   end
+  draw_sprites()
+end
 
-  if mode == 'menu' then
-    cls()
-    map(0, 0)
-    print('Soteria', 75, 35, 15, 1, 2)
-    print('Press X to start', 70, 55, 15, 1, 1)
-    print('Arrows - move around', 70, 80, 15, 1, 1)
-    print('     Z - jump', 70, 90, 15, 1, 1)
-    print('     X - make them jump!', 70, 100, 15, 1, 1)
-    
-    if btnp(5) then
-      mode='game'
-      reset_leve()
-    end
-  end
-  
-  if mode == 'gameover' then
-    cls()
-    map(180, 120)
-    if gameover_music_plaied == false then
-     music(game_over_music,-1,-1,false)
-     gameover_music_plaied=true    
-    end
-    print('Ouch!', 75, 30, 15, 1, 2)
-    print('You need to save at least 5 of them', 10, 60, 15, 1, 1)
-    print('Press X to restart the level', 10, 90, 15, 1, 1)
-    if btnp(5) then
-      mode='game'
-  	  reset_leve()
-      music() -- stops any music
-    end
-  end
- 
-  if mode == 'nextlevel' then
-    cls()
-    map(210, 120)        
-    print('Well done!', 35, 30, 15, 1, 2)
-    print('Press X to go to the next level', 20, 90, 15, 1, 1)
-    if btnp(5) then
-      mode='game'
-      level=level+1
-  	  reset_leve()
-    end
-  end
+if mode == 'menu' then
+  cls()
+  map(0, 0)
+  print('Soteria', 75, 35, 15, 1, 2)
+  print('Press X to start', 70, 55, 15, 1, 1)
+  print('Arrows - move around', 70, 80, 15, 1, 1)
+  print('     Z - jump', 70, 90, 15, 1, 1)
+  print('     X - make them jump!', 70, 100, 15, 1, 1)
 
-  if dead_lems + score == num_lems then
-  	if score < 5 then
-  	 mode='gameover'
-  	 reset_leve()
-  	else
-  	 mode='nextlevel'
-  	end
+  if btnp(5) then
+    mode='game'
+    reset_leve()
   end
-  --debug_print()
+end
+
+if mode == 'gameover' then
+  cls()
+  map(180, 120)
+  if gameover_music_plaied == false then
+    music(game_over_music, -1, -1, false)
+    gameover_music_plaied=true
+  end
+  print('Ouch!', 75, 30, 15, 1, 2)
+  print('You need to save at least 5 of them', 10, 60, 15, 1, 1)
+  print('Press X to restart the level', 10, 90, 15, 1, 1)
+  if btnp(5) then
+    mode='game'
+    reset_leve()
+    music() -- stops any music
+  end
+end
+
+if mode == 'nextlevel' then
+  cls()
+  map(210, 120)
+  print('Well done!', 35, 30, 15, 1, 2)
+  print('Press X to go to the next level', 20, 90, 15, 1, 1)
+  if btnp(5) then
+    mode='game'
+    level=level+1
+    reset_leve()
+  end
+end
+
+if dead_lems + score == num_lems then
+  if score < 5 then
+    mode='gameover'
+    reset_leve()
+  else
+    mode='nextlevel'
+  end
+end
+--debug_print()
 end
 
 -- <TILES>
