@@ -47,7 +47,7 @@ score=0
 dead_lems=0
 num_lems=10
 mode='menu'
-level=0
+level=2
 
 p={
   x=20, 
